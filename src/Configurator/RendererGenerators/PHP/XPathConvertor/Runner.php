@@ -148,10 +148,10 @@ class Runner
 	}
 
 	/**
-	* 
+	* Get the list of arguments produced by a regexp's match
 	*
-	* @param  array    $matches
-	* @param  string   $name
+	* @param  string[] $matches Regexp matches
+	* @param  string   $name    Regexp name
 	* @return string[]
 	*/
 	protected function getArguments(array $matches, $name)
@@ -168,13 +168,16 @@ class Runner
 	}
 
 	/**
-	* 
+	* Insert capture names into given regexp
 	*
-	* @return void
+	* @param  string $name   Name of the regexp, used to name captures
+	* @param  string $regexp Original regexp
+	* @return string         Modified regexp
 	*/
 	protected function insertCaptureNames($name, $regexp)
 	{
 		$i = 0;
+
 		return preg_replace_callback(
 			'((?<!\\\\)\\((?!\\?))',
 			function ($m) use (&$i, $name)
