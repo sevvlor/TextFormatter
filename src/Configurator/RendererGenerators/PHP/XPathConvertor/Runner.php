@@ -41,8 +41,9 @@ class Runner
 	protected $regexps;
 
 	/**
-	* 
+	* Convert given XPath expression to PHP
 	*
+	* @param  string $expr
 	* @return string
 	*/
 	public function convert($expr)
