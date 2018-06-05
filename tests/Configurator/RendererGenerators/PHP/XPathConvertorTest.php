@@ -43,21 +43,6 @@ class XPathConvertorTest extends Test
 	}
 
 	/**
-	* @dataProvider getConvertXPathTestsAdvanced
-	* @testdox convertXPath() advanced tests (PCRE < 8.13)
-	*/
-	public function testConvertXPathAdvancedFallback($original, $expected, $fallback = null)
-	{
-		if (!isset($fallback))
-		{
-			$fallback = '$this->xpath->evaluate(' . var_export($original, true) . ',$node)';
-		}
-		$convertor = new XPathConvertor;
-		$convertor->pcreVersion = '8.02 2010-03-19';
-		$this->assertSame($fallback, $convertor->convertXPath($original));
-	}
-
-	/**
 	* @dataProvider getConvertXPathTestsMbstring
 	* @testdox convertXPath() mbstring tests
 	*/
@@ -68,7 +53,6 @@ class XPathConvertorTest extends Test
 			$this->markTestSkipped('This optimization requires PCRE 8.13 or newer');
 		}
 		$convertor = new XPathConvertor;
-		$convertor->useMultibyteStringFunctions = true;
 		$this->assertSame($expected, $convertor->convertXPath($original));
 	}
 
@@ -94,21 +78,6 @@ class XPathConvertorTest extends Test
 		}
 		$convertor = new XPathConvertor;
 		$this->assertSame($expected, $convertor->convertCondition($original));
-	}
-
-	/**
-	* @dataProvider getConvertConditionTestsAdvanced
-	* @testdox convertCondition() advanced tests (PCRE < 8.13)
-	*/
-	public function testConvertConditionFallback($original, $expected, $fallback = null)
-	{
-		if (!isset($fallback))
-		{
-			$fallback = '$this->xpath->evaluate(' . var_export($original, true) . ',$node)';
-		}
-		$convertor = new XPathConvertor;
-		$convertor->pcreVersion = '8.02 2010-03-19';
-		$this->assertSame($fallback, $convertor->convertCondition($original));
 	}
 
 	public function getConvertXPathTestsBasic()
@@ -144,47 +113,47 @@ class XPathConvertorTest extends Test
 			],
 			[
 				'123',
-				"'123'"
+				'123'
 			],
 			[
 				'normalize-space(@bar)',
 				"\$this->xpath->evaluate('normalize-space(@bar)',\$node)"
 			],
-			[
-				'substring(.,1,2)',
-				"\$this->xpath->evaluate('substring(.,1,2)',\$node)"
-			],
-			[
-				'substring(.,0,2)',
-				"\$this->xpath->evaluate('substring(.,0,2)',\$node)"
-			],
-			[
-				'substring(.,@x,1)',
-				"\$this->xpath->evaluate('substring(.,@x,1)',\$node)"
-			],
-			[
-				'substring(.,1,@x)',
-				"\$this->xpath->evaluate('substring(.,1,@x)',\$node)"
-			],
-			[
-				'substring(.,2)',
-				"\$this->xpath->evaluate('substring(.,2)',\$node)"
-			],
+//			[
+//				'substring(.,1,2)',
+//				"\$this->xpath->evaluate('substring(.,1,2)',\$node)"
+//			],
+//			[
+//				'substring(.,0,2)',
+//				"\$this->xpath->evaluate('substring(.,0,2)',\$node)"
+//			],
+//			[
+//				'substring(.,@x,1)',
+//				"\$this->xpath->evaluate('substring(.,@x,1)',\$node)"
+//			],
+//			[
+//				'substring(.,1,@x)',
+//				"\$this->xpath->evaluate('substring(.,1,@x)',\$node)"
+//			],
+//			[
+//				'substring(.,2)',
+//				"\$this->xpath->evaluate('substring(.,2)',\$node)"
+//			],
 			[
 				'//X[@a = current()/@a]',
-				"\$this->xpath->evaluate('//X[@a = '.\$node->getNodePath().'/@a]',\$node)"
+				"\$this->xpath->evaluate('string(//X[@a = '.\$node->getNodePath().'/@a])',\$node)"
 			],
 			[
 				'0',
-				"'0'"
+				'0'
 			],
 			[
 				'0777',
-				"'777'"
+				'777'
 			],
 			[
 				'-0777',
-				"'-777'"
+				'-777'
 			],
 		];
 	}
@@ -194,11 +163,11 @@ class XPathConvertorTest extends Test
 		return [
 			[
 				'string-length(@bar)',
-				"strlen(preg_replace('(.)us','.',\$node->getAttribute('bar')))"
+				"preg_match_all('(.)su',\$node->getAttribute('bar'))"
 			],
 			[
 				'string-length()',
-				"strlen(preg_replace('(.)us','.',\$node->textContent))"
+				"preg_match_all('(.)su',\$node->textContent)"
 			],
 			[
 				'translate(@bar,"abc","ABC")',
@@ -287,33 +256,20 @@ class XPathConvertorTest extends Test
 	{
 		return [
 			[
-				// NOTE: as per XPath specs, the length is adjusted to the negative position
-				'substring(.,0,2)',
-				"mb_substr(\$node->textContent,0,1,'utf-8')"
-			],
-			[
 				'substring(.,1,2)',
 				"mb_substr(\$node->textContent,0,2,'utf-8')"
 			],
-			[
-				'substring(.,@x,1)',
-				"mb_substr(\$node->textContent,max(0,\$node->getAttribute('x')-1),1,'utf-8')"
-			],
-			[
-				'substring(.,1,@x)',
-				"mb_substr(\$node->textContent,0,max(0,\$node->getAttribute('x')),'utf-8')"
-			],
+//			[
+//				'substring(.,@x,1)',
+//				"mb_substr(\$node->textContent,max(0,\$node->getAttribute('x')-1),1,'utf-8')"
+//			],
+//			[
+//				'substring(.,1,@x)',
+//				"mb_substr(\$node->textContent,0,max(0,\$node->getAttribute('x')),'utf-8')"
+//			],
 			[
 				'substring(.,2)',
 				"mb_substr(\$node->textContent,1,null,'utf-8')"
-			],
-			[
-				'string-length()',
-				"mb_strlen(\$node->textContent,'utf-8')"
-			],
-			[
-				'string-length(@bar)',
-				"mb_strlen(\$node->getAttribute('bar'),'utf-8')"
 			],
 		];
 	}
@@ -353,28 +309,23 @@ class XPathConvertorTest extends Test
 		return [
 			[
 				".='foo'",
-				"\$node->textContent==='foo'",
-				"\$this->xpath->evaluate('.=\'foo\'',\$node)"
+				"\$node->textContent=='foo'"
 			],
 			[
 				"@foo='foo'",
-				"\$node->getAttribute('foo')==='foo'",
-				"\$this->xpath->evaluate('@foo=\'foo\'',\$node)"
+				"\$node->getAttribute('foo')=='foo'"
 			],
 			[
 				".='fo\"o'",
-				"\$node->textContent==='fo\"o'",
-				"\$this->xpath->evaluate('.=\'fo\"o\'',\$node)"
+				"\$node->textContent=='fo\"o'"
 			],
 			[
 				'.=\'"_"\'',
-				'$node->textContent===\'"_"\'',
-				"\$this->xpath->evaluate('.=\'\"_\"\'',\$node)"
+				'$node->textContent==\'"_"\''
 			],
 			[
 				".='foo'or.='bar'",
-				"\$node->textContent==='foo'||\$node->textContent==='bar'",
-				"\$this->xpath->evaluate('.=\'foo\'or.=\'bar\'',\$node)"
+				"\$node->textContent=='foo'||\$node->textContent=='bar'"
 			],
 			[
 				'.=3',
@@ -394,11 +345,11 @@ class XPathConvertorTest extends Test
 			],
 			[
 				'@foo != @bar',
-				"\$node->getAttribute('foo')!==\$node->getAttribute('bar')"
+				"\$node->getAttribute('foo')!=\$node->getAttribute('bar')"
 			],
 			[
 				'@foo = @bar or @baz',
-				"\$node->getAttribute('foo')===\$node->getAttribute('bar')||\$node->hasAttribute('baz')"
+				"\$node->getAttribute('foo')==\$node->getAttribute('bar')||\$node->hasAttribute('baz')"
 			],
 			[
 				'not(@foo) and @bar',
@@ -410,8 +361,7 @@ class XPathConvertorTest extends Test
 			],
 			[
 				".='x'or.='y'or.='z'",
-				"\$node->textContent==='x'||\$node->textContent==='y'||\$node->textContent==='z'",
-				"\$this->xpath->evaluate('.=\'x\'or.=\'y\'or.=\'z\'',\$node)"
+				"\$node->textContent=='x'||\$node->textContent=='y'||\$node->textContent=='z'"
 			],
 			[
 				"@x and @y and @z and @a",
@@ -419,28 +369,23 @@ class XPathConvertorTest extends Test
 			],
 			[
 				"@type='gifv' and @width and @height and @height != 0",
-				"\$node->getAttribute('type')==='gifv'&&\$node->hasAttribute('width')&&\$node->hasAttribute('height')&&\$node->getAttribute('height')!=0",
-				"\$this->xpath->evaluate('@type=\'gifv\' and @width and @height and @height != 0',\$node)"
+				"\$node->getAttribute('type')=='gifv'&&\$node->hasAttribute('width')&&\$node->hasAttribute('height')&&\$node->getAttribute('height')!=0"
 			],
 			[
 				"contains(@foo,'x')",
-				"(strpos(\$node->getAttribute('foo'),'x')!==false)",
-				"\$this->xpath->evaluate('contains(@foo,\'x\')',\$node)"
+				"(strpos(\$node->getAttribute('foo'),'x')!==false)"
 			],
 			[
 				" contains( @foo , 'x' ) ",
-				"(strpos(\$node->getAttribute('foo'),'x')!==false)",
-				"\$this->xpath->evaluate('contains( @foo , \'x\' )',\$node)"
+				"(strpos(\$node->getAttribute('foo'),'x')!==false)"
 			],
 			[
 				"not(contains(@id, 'bar'))",
-				"(strpos(\$node->getAttribute('id'),'bar')===false)",
-				"\$this->xpath->evaluate('not(contains(@id, \'bar\'))',\$node)"
+				"(strpos(\$node->getAttribute('id'),'bar')===false)"
 			],
 			[
 				"starts-with(@foo,'bar')",
-				"(strpos(\$node->getAttribute('foo'),'bar')===0)",
-				"\$this->xpath->evaluate('starts-with(@foo,\'bar\')',\$node)"
+				"(strpos(\$node->getAttribute('foo'),'bar')===0)"
 			],
 			[
 				'@foo and (@bar or @baz)',
@@ -448,33 +393,24 @@ class XPathConvertorTest extends Test
 			],
 			[
 				'(@a = @b) or (@b = @c)',
-				"(\$node->getAttribute('a')===\$node->getAttribute('b'))||(\$node->getAttribute('b')===\$node->getAttribute('c'))"
+				"(\$node->getAttribute('a')==\$node->getAttribute('b'))||(\$node->getAttribute('b')==\$node->getAttribute('c'))"
 			],
 			[
 				'ancestor::foo',
-				"\$this->xpath->evaluate('boolean(ancestor::foo)',\$node)",
-				"\$this->xpath->evaluate('boolean(ancestor::foo)',\$node)",
+				"\$this->xpath->evaluate('boolean(ancestor::foo)',\$node)"
 			],
 			[
 				"starts-with(@type,'decimal-') or starts-with(@type,'lower-') or starts-with(@type,'upper-')",
-				"(strpos(\$node->getAttribute('type'),'decimal-')===0)||(strpos(\$node->getAttribute('type'),'lower-')===0)||(strpos(\$node->getAttribute('type'),'upper-')===0)",
-				"\$this->xpath->evaluate('starts-with(@type,\'decimal-\') or starts-with(@type,\'lower-\') or starts-with(@type,\'upper-\')',\$node)"
+				"(strpos(\$node->getAttribute('type'),'decimal-')===0)||(strpos(\$node->getAttribute('type'),'lower-')===0)||(strpos(\$node->getAttribute('type'),'upper-')===0)"
+			],
+			[
+				'@tld="es" and $AMAZON_ASSOCIATE_TAG_ES',
+				"\$node->getAttribute('tld')=='es'&&\$this->params['AMAZON_ASSOCIATE_TAG_ES']!==''"
+			],
+			[
+				'@tld="es"and$AMAZON_ASSOCIATE_TAG_ES',
+				"\$node->getAttribute('tld')=='es'&&\$this->params['AMAZON_ASSOCIATE_TAG_ES']!==''"
 			],
 		];
-	}
-
-	/**
-	* @testdox Covering test for convertXPath()
-	*/
-	public function testConvertXPathUnsupported()
-	{
-		$convertor = new XPathConvertor;
-		$method = new ReflectionProperty(get_class($convertor), 'regexp');
-		$method->setAccessible(true);
-		$method->setValue($convertor, '()');
-		$this->assertSame(
-			"\$this->xpath->evaluate('@foo=@bar',\$node)",
-			$convertor->convertXPath('@foo=@bar')
-		);
 	}
 }
