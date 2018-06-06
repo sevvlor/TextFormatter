@@ -102,8 +102,8 @@ class XPathConvertorTest extends Test
 				'123'
 			],
 			[
-				'normalize-space(@bar)',
-				"\$this->xpath->evaluate('normalize-space(@bar)',\$node)"
+				'substring-after(@foo,@bar)',
+				"\$this->xpath->evaluate('substring-after(@foo,@bar)',\$node)"
 			],
 			[
 				'//X[@a = current()/@a]',
