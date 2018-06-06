@@ -12,6 +12,23 @@ class SingleByteStringManipulationTest extends AbstractConvertorTest
 	public function getConvertorTests()
 	{
 		return [
+			// Concat
+			[
+				"concat('foo')",
+				"'foo'"
+			],
+			[
+				"concat('foo', 'bar')",
+				"'foo'.'bar'"
+			],
+			[
+				"concat(@foo, @bar)",
+				"\$node->getAttribute('foo').\$node->getAttribute('bar')"
+			],
+			[
+				"concat('foo', 'bar', 'baz')",
+				"'foo'.'bar'.'baz'"
+			],
 			// SubstringAfter
 			[
 				"substring-after(@foo, 'bar')",

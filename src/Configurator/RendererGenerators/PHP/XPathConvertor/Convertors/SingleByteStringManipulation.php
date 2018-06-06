@@ -15,6 +15,7 @@ class SingleByteStringManipulation extends AbstractConvertor
 	public function getRegexpGroups()
 	{
 		return [
+			'Concat'          => 'String',
 			'SubstringAfter'  => 'String',
 			'SubstringBefore' => 'String',
 			'Translate'       => 'String'
@@ -27,10 +28,27 @@ class SingleByteStringManipulation extends AbstractConvertor
 	public function getRegexps()
 	{
 		return [
+			'Concat'          => 'concat \\( ((?&String)) ((?:, (?&String))+ )?\\)',
 			'SubstringAfter'  => 'substring-after \\( ((?&String)) , ((?&LiteralString)) \\)',
 			'SubstringBefore' => 'substring-before \\( ((?&String)) , ((?&String)) \\)',
 			'Translate'       => 'translate \\( ((?&String)) , ((?&LiteralString)) , ((?&LiteralString)) \\)'
 		];
+	}
+
+	/**
+	* 
+	*
+	* @return void
+	*/
+	public function convertConcat($expr1, $expr2 = null)
+	{
+		$php = $this->convert($expr1);
+		if (isset($expr2))
+		{
+			$php .= '.' . $this->convert('concat(' . ltrim($expr2, ',') . ')');
+		}
+
+		return $php;
 	}
 
 	/**
