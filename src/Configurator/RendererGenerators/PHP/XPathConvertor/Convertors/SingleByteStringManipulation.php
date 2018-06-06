@@ -16,6 +16,7 @@ class SingleByteStringManipulation extends AbstractConvertor
 	{
 		return [
 			'Concat'          => 'String',
+			'NormalizeSpace'  => 'String',
 			'SubstringAfter'  => 'String',
 			'SubstringBefore' => 'String',
 			'Translate'       => 'String'
@@ -28,7 +29,8 @@ class SingleByteStringManipulation extends AbstractConvertor
 	public function getRegexps()
 	{
 		return [
-			'Concat'          => 'concat \\( ((?&String)) ((?:, (?&String))+ )?\\)',
+			'Concat'          => 'concat \\( ((?&String)) ((?:, (?&String) )+)?\\)',
+			'NormalizeSpace'  => 'normalize-space \\( ((?&String)) \\)',
 			'SubstringAfter'  => 'substring-after \\( ((?&String)) , ((?&LiteralString)) \\)',
 			'SubstringBefore' => 'substring-before \\( ((?&String)) , ((?&String)) \\)',
 			'Translate'       => 'translate \\( ((?&String)) , ((?&LiteralString)) , ((?&LiteralString)) \\)'
@@ -36,9 +38,11 @@ class SingleByteStringManipulation extends AbstractConvertor
 	}
 
 	/**
-	* 
+	* Convert a call to concat()
 	*
-	* @return void
+	* @param  string $expr1 First argument
+	* @param  string $expr2 All other comma-separated arguments, starting with a comma
+	* @return string
 	*/
 	public function convertConcat($expr1, $expr2 = null)
 	{
@@ -49,6 +53,17 @@ class SingleByteStringManipulation extends AbstractConvertor
 		}
 
 		return $php;
+	}
+
+	/**
+	* Convert a call to normalize-space()
+	*
+	* @param  string $expr
+	* @return string
+	*/
+	public function convertNormalizeSpace($expr)
+	{
+		return "preg_replace('(\\\\s+)',' ',trim(" . $this->convert($expr) . '))';
 	}
 
 	/**

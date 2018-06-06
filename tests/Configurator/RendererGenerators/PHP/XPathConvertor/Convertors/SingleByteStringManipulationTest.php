@@ -26,8 +26,13 @@ class SingleByteStringManipulationTest extends AbstractConvertorTest
 				"\$node->getAttribute('foo').\$node->getAttribute('bar')"
 			],
 			[
-				"concat('foo', 'bar', 'baz')",
+				"concat( 'foo' , 'bar' , 'baz' )",
 				"'foo'.'bar'.'baz'"
+			],
+			// NormalizeSpace
+			[
+				"normalize-space(@foo)",
+				"preg_replace('(\\\\s+)',' ',trim(\$node->getAttribute('foo')))"
 			],
 			// SubstringAfter
 			[
