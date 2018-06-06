@@ -277,6 +277,7 @@
 			<file>tests/Plugins/Preg/ParserTest.php</file>
 
 			<file>tests/Configurator/RendererGenerators/PHP/XPathConvertorTest.php</file>
+			<file>tests/Configurator/RendererGenerators/PHP/XPathConvertor/RunnerTest.php</file>
 			<file>tests/Configurator/RendererGenerators/PHP/XPathConvertor/Convertors/BooleanFunctionsTest.php</file>
 			<file>tests/Configurator/RendererGenerators/PHP/XPathConvertor/Convertors/BooleanOperatorsTest.php</file>
 			<file>tests/Configurator/RendererGenerators/PHP/XPathConvertor/Convertors/ComparisonsTest.php</file>

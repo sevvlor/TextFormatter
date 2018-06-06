@@ -22,13 +22,7 @@ class XPathConvertor
 	*/
 	public function __construct(Runner $runner = null)
 	{
-		if (!isset($runner))
-		{
-			$runner = new Runner;
-			$runner->setDefaultConvertors();
-		}
-
-		$this->runner = $runner;
+		$this->runner = $runner ?: new Runner;
 	}
 
 	/**

@@ -43,20 +43,6 @@ class XPathConvertorTest extends Test
 	}
 
 	/**
-	* @dataProvider getConvertXPathTestsMbstring
-	* @testdox convertXPath() mbstring tests
-	*/
-	public function testConvertXPathMbstring($original, $expected, $setup = null)
-	{
-		if (version_compare(PCRE_VERSION, '8.13', '<'))
-		{
-			$this->markTestSkipped('This optimization requires PCRE 8.13 or newer');
-		}
-		$convertor = new XPathConvertor;
-		$this->assertSame($expected, $convertor->convertXPath($original));
-	}
-
-	/**
 	* @dataProvider getConvertConditionTestsBasic
 	* @testdox convertCondition() basic tests
 	*/
@@ -119,26 +105,6 @@ class XPathConvertorTest extends Test
 				'normalize-space(@bar)',
 				"\$this->xpath->evaluate('normalize-space(@bar)',\$node)"
 			],
-//			[
-//				'substring(.,1,2)',
-//				"\$this->xpath->evaluate('substring(.,1,2)',\$node)"
-//			],
-//			[
-//				'substring(.,0,2)',
-//				"\$this->xpath->evaluate('substring(.,0,2)',\$node)"
-//			],
-//			[
-//				'substring(.,@x,1)',
-//				"\$this->xpath->evaluate('substring(.,@x,1)',\$node)"
-//			],
-//			[
-//				'substring(.,1,@x)',
-//				"\$this->xpath->evaluate('substring(.,1,@x)',\$node)"
-//			],
-//			[
-//				'substring(.,2)',
-//				"\$this->xpath->evaluate('substring(.,2)',\$node)"
-//			],
 			[
 				'//X[@a = current()/@a]',
 				"\$this->xpath->evaluate('string(//X[@a = '.\$node->getNodePath().'/@a])',\$node)"
@@ -248,28 +214,6 @@ class XPathConvertorTest extends Test
 				'100 * (@height + 49) div @width',
 				"100*(\$node->getAttribute('height')+49)/\$node->getAttribute('width')",
 				"\$this->xpath->evaluate('string(100 * (@height + 49) div @width)',\$node)"
-			],
-		];
-	}
-
-	public function getConvertXPathTestsMbstring()
-	{
-		return [
-			[
-				'substring(.,1,2)',
-				"mb_substr(\$node->textContent,0,2,'utf-8')"
-			],
-//			[
-//				'substring(.,@x,1)',
-//				"mb_substr(\$node->textContent,max(0,\$node->getAttribute('x')-1),1,'utf-8')"
-//			],
-//			[
-//				'substring(.,1,@x)',
-//				"mb_substr(\$node->textContent,0,max(0,\$node->getAttribute('x')),'utf-8')"
-//			],
-			[
-				'substring(.,2)',
-				"mb_substr(\$node->textContent,1,null,'utf-8')"
 			],
 		];
 	}

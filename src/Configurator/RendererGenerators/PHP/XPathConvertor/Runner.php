@@ -41,6 +41,16 @@ class Runner
 	protected $regexps;
 
 	/**
+	* Constructor
+	*
+	* @return void
+	*/
+	public function __construct()
+	{
+		$this->setConvertors($this->getDefaultConvertors());
+	}
+
+	/**
 	* Convert given XPath expression to PHP
 	*
 	* @param  string $expr
@@ -59,35 +69,13 @@ class Runner
 			}
 		}
 
-		throw new RuntimeException('Cannot convert ' . $expr);
+		throw new RuntimeException("Cannot convert '" . $expr . "'");
 	}
 
 	/**
-	* 
+	* Set the list of convertors used by this instance
 	*
-	* @return AbstractConvertor[]
-	*/
-	public function getDefaultConvertors()
-	{
-		$convertors   = [];
-		$convertors[] = new BooleanFunctions($this);
-		$convertors[] = new BooleanOperators($this);
-		$convertors[] = new Comparisons($this);
-		$convertors[] = new Core($this);
-		$convertors[] = new Math($this);
-		if (extension_loaded('mbstring'))
-		{
-			$convertors[] = new MultiByteStringManipulation($this);
-		}
-		$convertors[] = new SingleByteStringFunctions($this);
-		$convertors[] = new SingleByteStringManipulation($this);
-
-		return $convertors;
-	}
-
-	/**
-	* 
-	*
+	* @param  AbstractConvertor[] $convertors
 	* @return void
 	*/
 	public function setConvertors(array $convertors)
@@ -114,17 +102,7 @@ class Runner
 	}
 
 	/**
-	* 
-	*
-	* @return void
-	*/
-	public function setDefaultConvertors()
-	{
-		$this->setConvertors($this->getDefaultConvertors());
-	}
-
-	/**
-	* 
+	* Add a convertor to the list used by this instance
 	*
 	* @param  AbstractConvertor $convertor
 	* @return void
@@ -165,6 +143,29 @@ class Runner
 		}
 
 		return $args;
+	}
+
+	/**
+	* Return the default list of convertors
+	*
+	* @return AbstractConvertor[]
+	*/
+	protected function getDefaultConvertors()
+	{
+		$convertors   = [];
+		$convertors[] = new BooleanFunctions($this);
+		$convertors[] = new BooleanOperators($this);
+		$convertors[] = new Comparisons($this);
+		$convertors[] = new Core($this);
+		$convertors[] = new Math($this);
+		if (extension_loaded('mbstring'))
+		{
+			$convertors[] = new MultiByteStringManipulation($this);
+		}
+		$convertors[] = new SingleByteStringFunctions($this);
+		$convertors[] = new SingleByteStringManipulation($this);
+
+		return $convertors;
 	}
 
 	/**

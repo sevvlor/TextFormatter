@@ -15,13 +15,11 @@ abstract class AbstractConvertorTest extends Test
 	*/
 	public function test($original, $expected)
 	{
-		$runner = new Runner;
-		$runner->setDefaultConvertors();
-
 		if ($expected === false)
 		{
 			$this->setExpectedException('RuntimeException', 'Cannot convert');
 		}
+		$runner = new Runner;
 
 		$this->assertEquals($expected, $runner->convert($original));
 	}
