@@ -911,14 +911,7 @@ class PHPTest extends Test
 			[
 				'<xsl:value-of select="string-length(@bar)"/>',
 				"preg_match_all('(.)su',\$node->getAttribute('bar'))",
-				'string-length',
-				function ($test)
-				{
-					if (version_compare(PCRE_VERSION, '8.13', '<'))
-					{
-						$this->markTestSkipped('This optimization requires PCRE 8.13 or newer');
-					}
-				}
+				'string-length'
 			],
 			// XPath in conditions
 			[
