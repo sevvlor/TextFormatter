@@ -24,10 +24,15 @@ class BooleanOperators extends AbstractConvertor
 	*/
 	public function getRegexps()
 	{
+		// Create a boolean expression that can start a recursive pattern and a more complete
+		// expression that can be used in the middle of a pattern
+		$booleanExpr    = '((?&And)|(?&Boolean)|(?&Comparison)|(?&Or))';
+		$booleanStarter = '((?&Boolean)|(?&Comparison))';
+
 		return [
-			'And'        => '((?&Boolean)|(?&Comparison)) and ((?&And)|(?&Boolean)|(?&Comparison)|(?&Or))',
-			'BooleanSub' => '\\( ((?&And)|(?&Boolean)|(?&Comparison)|(?&Or)) \\)',
-			'Or'         => '((?&Boolean)|(?&Comparison)) or ((?&And)|(?&Boolean)|(?&Comparison)|(?&Or))'
+			'And'        => $booleanStarter . ' and ' . $booleanExpr,
+			'BooleanSub' => '\\( ' . $booleanExpr . ' \\)',
+			'Or'         => $booleanStarter . ' or ' . $booleanExpr
 		];
 	}
 
