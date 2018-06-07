@@ -25,7 +25,7 @@ class MultiByteStringManipulation extends AbstractConvertor
 	public function getRegexps()
 	{
 		return [
-			'Substring' => 'substring \\( ((?&String)) , ((?&Math)|(?&Number)) (?:, ((?&Math)|(?&Number)))? \\)'
+			'Substring' => 'substring \\( ((?&String)) , ((?&Attribute)|(?&Math)|(?&Number)) (?:, ((?&Attribute)|(?&Math)|(?&Number)))? \\)'
 		];
 	}
 
