@@ -15,10 +15,10 @@ use s9e\TextFormatter\Tests\Test;
 class XPathConvertorTest extends Test
 {
 	/**
-	* @dataProvider getConvertXPathTestsBasic
-	* @testdox convertXPath() basic tests
+	* @dataProvider getConvertXPathTests
+	* @testdox convertXPath() tests
 	*/
-	public function testConvertXPathBasic($original, $expected)
+	public function testConvertXPath($original, $expected)
 	{
 		$convertor = new XPathConvertor;
 		if ($expected instanceof Exception)
@@ -29,44 +29,16 @@ class XPathConvertorTest extends Test
 	}
 
 	/**
-	* @dataProvider getConvertXPathTestsAdvanced
-	* @testdox convertXPath() advanced tests (PCRE >= 8.13)
+	* @dataProvider getConvertConditionTests
+	* @testdox convertCondition() tests
 	*/
-	public function testConvertXPathAdvanced($original, $expected, $fallback = null)
-	{
-		if (version_compare(PCRE_VERSION, '8.13', '<'))
-		{
-			$this->markTestSkipped('This optimization requires PCRE 8.13 or newer');
-		}
-		$convertor = new XPathConvertor;
-		$this->assertSame($expected, $convertor->convertXPath($original));
-	}
-
-	/**
-	* @dataProvider getConvertConditionTestsBasic
-	* @testdox convertCondition() basic tests
-	*/
-	public function testConvertConditionBasic($original, $expected)
+	public function testConvertCondition($original, $expected)
 	{
 		$convertor = new XPathConvertor;
 		$this->assertSame($expected, $convertor->convertCondition($original));
 	}
 
-	/**
-	* @dataProvider getConvertConditionTestsAdvanced
-	* @testdox convertCondition() advanced tests (PCRE >= 8.13)
-	*/
-	public function testConvertConditionAdvanced($original, $expected, $fallback = null)
-	{
-		if (version_compare(PCRE_VERSION, '8.13', '<'))
-		{
-			$this->markTestSkipped('This optimization requires PCRE 8.13 or newer');
-		}
-		$convertor = new XPathConvertor;
-		$this->assertSame($expected, $convertor->convertCondition($original));
-	}
-
-	public function getConvertXPathTestsBasic()
+	public function getConvertXPathTests()
 	{
 		return [
 			[
@@ -121,12 +93,6 @@ class XPathConvertorTest extends Test
 				'-0777',
 				'-777'
 			],
-		];
-	}
-
-	public function getConvertXPathTestsAdvanced()
-	{
-		return [
 			[
 				'string-length(@bar)',
 				"preg_match_all('(.)su',\$node->getAttribute('bar'))"
@@ -137,48 +103,39 @@ class XPathConvertorTest extends Test
 			],
 			[
 				'translate(@bar,"abc","ABC")',
-				"strtr(\$node->getAttribute('bar'),'abc','ABC')",
-				"\$this->xpath->evaluate('translate(@bar,\"abc\",\"ABC\")',\$node)",
+				"strtr(\$node->getAttribute('bar'),'abc','ABC')"
 			],
 			[
 				'translate(@bar,"abc","ABC")',
-				"strtr(\$node->getAttribute('bar'),'abc','ABC')",
-				"\$this->xpath->evaluate('translate(@bar,\"abc\",\"ABC\")',\$node)"
+				"strtr(\$node->getAttribute('bar'),'abc','ABC')"
 			],
 			[
 				'translate(@bar,"éè","ÉÈ")',
-				"strtr(\$node->getAttribute('bar'),['é'=>'É','è'=>'È'])",
-				"\$this->xpath->evaluate('translate(@bar,\"éè\",\"ÉÈ\")',\$node)"
+				"strtr(\$node->getAttribute('bar'),['é'=>'É','è'=>'È'])"
 			],
 			[
 				'translate(@bar,"ab","ABC")',
-				"strtr(\$node->getAttribute('bar'),'ab','AB')",
-				"\$this->xpath->evaluate('translate(@bar,\"ab\",\"ABC\")',\$node)"
+				"strtr(\$node->getAttribute('bar'),'ab','AB')"
 			],
 			[
 				'translate(@bar,"abcd","AB")',
-				"strtr(\$node->getAttribute('bar'),['a'=>'A','b'=>'B','c'=>'','d'=>''])",
-				"\$this->xpath->evaluate('translate(@bar,\"abcd\",\"AB\")',\$node)"
+				"strtr(\$node->getAttribute('bar'),['a'=>'A','b'=>'B','c'=>'','d'=>''])"
 			],
 			[
 				'translate(@bar,"abbd","ABCD")',
-				"strtr(\$node->getAttribute('bar'),'abd','ABD')",
-				"\$this->xpath->evaluate('translate(@bar,\"abbd\",\"ABCD\")',\$node)"
+				"strtr(\$node->getAttribute('bar'),'abd','ABD')"
 			],
 			[
 				'substring-after(@foo,"/")',
-				"substr(strstr(\$node->getAttribute('foo'),'/'),1)",
-				"\$this->xpath->evaluate('substring-after(@foo,\"/\")',\$node)"
+				"substr(strstr(\$node->getAttribute('foo'),'/'),1)"
 			],
 			[
 				'substring-after(@foo,"&amp;")',
-				"substr(strstr(\$node->getAttribute('foo'),'&amp;'),5)",
-				"\$this->xpath->evaluate('substring-after(@foo,\"&amp;\")',\$node)"
+				"substr(strstr(\$node->getAttribute('foo'),'&amp;'),5)"
 			],
 			[
 				'substring-before(@foo,"/")',
-				"strstr(\$node->getAttribute('foo'),'/',true)",
-				"\$this->xpath->evaluate('substring-before(@foo,\"/\")',\$node)"
+				"strstr(\$node->getAttribute('foo'),'/',true)"
 			],
 			[
 				'substring-before(@foo,@bar)',
@@ -187,38 +144,32 @@ class XPathConvertorTest extends Test
 			// Math
 			[
 				'@foo + 12',
-				"\$node->getAttribute('foo')+12",
-				"\$this->xpath->evaluate('string(@foo + 12)',\$node)"
+				"\$node->getAttribute('foo')+12"
 			],
 			[
 				'44 + $bar',
-				"44+\$this->params['bar']",
-				"\$this->xpath->evaluate('string(44 + '.\$this->getParamAsXPath('bar').')',\$node)"
+				"44+\$this->params['bar']"
 			],
 			[
 				'@h * 3600 + @m * 60 + @s',
-				"\$node->getAttribute('h')*3600+\$node->getAttribute('m')*60+\$node->getAttribute('s')",
-				"\$this->xpath->evaluate('string(@h * 3600 + @m * 60 + @s)',\$node)"
+				"\$node->getAttribute('h')*3600+\$node->getAttribute('m')*60+\$node->getAttribute('s')"
 			],
 			[
 				'@x div@y',
-				"\$node->getAttribute('x')/\$node->getAttribute('y')",
-				"\$this->xpath->evaluate('string(@x div@y)',\$node)"
+				"\$node->getAttribute('x')/\$node->getAttribute('y')"
 			],
 			[
 				'(@height + 49)',
-				"(\$node->getAttribute('height')+49)",
-				"\$this->xpath->evaluate('string((@height + 49))',\$node)"
+				"(\$node->getAttribute('height')+49)"
 			],
 			[
 				'100 * (@height + 49) div @width',
-				"100*(\$node->getAttribute('height')+49)/\$node->getAttribute('width')",
-				"\$this->xpath->evaluate('string(100 * (@height + 49) div @width)',\$node)"
+				"100*(\$node->getAttribute('height')+49)/\$node->getAttribute('width')"
 			],
 		];
 	}
 
-	public function getConvertConditionTestsBasic()
+	public function getConvertConditionTests()
 	{
 		return [
 			[
@@ -245,12 +196,6 @@ class XPathConvertorTest extends Test
 				'@*',
 				'$node->attributes->length'
 			],
-		];
-	}
-
-	public function getConvertConditionTestsAdvanced()
-	{
-		return [
 			[
 				".='foo'",
 				"\$node->textContent=='foo'"
