@@ -28,14 +28,16 @@ class Comparisons extends AbstractConvertor
 	*/
 	public function getRegexps()
 	{
-		$scalar = '((?&Math)|(?&Number)|(?&String))';
+		$nonzero = '(0*[1-9]\\d*)';
+		$number  = '(\\d+)';
+		$scalar  = '((?&Math)|(?&Number)|(?&String))';
 
 		return [
 			'Eq'  => $scalar . ' (!?=) ' .  $scalar,
-			'Gt'  => $scalar . ' > (\\d+)',
-			'Gte' => $scalar . ' >= (0*[1-9]\\d*)',
-			'Lt'  => '(\\d+) < ' . $scalar,
-			'Lte' => '(0*[1-9]\\d*) <= ' . $scalar;
+			'Gt'  => $scalar . ' > ' . $number,
+			'Gte' => $scalar . ' >= ' . $nonzero,
+			'Lt'  => $number . ' < ' . $scalar,
+			'Lte' => $nonzero . ' <= ' . $scalar
 		];
 	}
 
