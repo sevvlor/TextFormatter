@@ -88,7 +88,7 @@ class XPathConvertor
 		}
 
 		// Make sure the expression evaluates as a string
-		if (!preg_match('(^[-\\w]*s(?:pace|tring)\\()', $expr))
+		if (!preg_match('(^[-\\w]*s(?:pace|tring)[-\\w]*\\()', $expr))
 		{
 			$expr = 'string(' . $expr . ')';
 		}
